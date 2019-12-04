@@ -2,48 +2,29 @@ const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
 
 const typeDefs = gql`
-  type Review @key(fields: "id") {
+  type ChatMessageObject {
     id: ID!
     body: String
-    author: User @provides(fields: "username")
-    product: Product
+    note: Note
   }
 
-  extend type User @key(fields: "id") {
-    id: ID! @external
-    username: String @external
-    reviews: [Review]
+  extend type Note @key(fields: "id") {
+    id: Int! @external
   }
-
-  extend type Product @key(fields: "upc") {
-    upc: String! @external
-    reviews: [Review]
+  
+  extend type Query {
+    getChatMessageObjectById(id: Int): ChatMessageObject
   }
 `;
 
 const resolvers = {
-  Review: {
-    author(review) {
-      return { __typename: "User", id: review.authorID };
-    }
+  Query: {
+      getChatMessageObjectById(_, args) {
+          return reviews.find(review => review.id == args.id);
+      },
   },
-  User: {
-    reviews(user) {
-      return reviews.filter(review => review.authorID === user.id);
-    },
-    numberOfReviews(user) {
-      return reviews.filter(review => review.authorID === user.id).length;
-    },
-    username(user) {
-      const found = usernames.find(username => username.id === user.id);
-      return found ? found.username : null;
-    }
+  ChatMessageObject: {
   },
-  Product: {
-    reviews(product) {
-      return reviews.filter(review => review.product.upc === product.upc);
-    }
-  }
 };
 
 const server = new ApolloServer({
@@ -55,37 +36,33 @@ const server = new ApolloServer({
   ])
 });
 
-server.listen({ port: 4002 }).then(({ url }) => {
+server.listen({ port: 4102 }).then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
 
-const usernames = [
-  { id: "1", username: "@ada" },
-  { id: "2", username: "@complete" }
-];
 const reviews = [
   {
     id: "1",
     authorID: "1",
-    product: { upc: "1" },
+    note: { id: 111 },
     body: "Love it!"
   },
   {
     id: "2",
     authorID: "1",
-    product: { upc: "2" },
+    note: { id: 222 },
     body: "Too expensive."
   },
   {
     id: "3",
     authorID: "2",
-    product: { upc: "3" },
+    note: { id: 333 },
     body: "Could be better."
   },
   {
     id: "4",
     authorID: "2",
-    product: { upc: "1" },
+    note: { id: 444 },
     body: "Prefer something else."
   }
 ];

@@ -3,11 +3,11 @@ const { buildFederatedSchema } = require("@apollo/federation");
 
 const typeDefs = gql`
   extend type Query {
-    topProducts(first: Int = 5): [Product]
+    topNotes(first: Int = 5): [Note]
   }
 
-  type Product @key(fields: "upc") {
-    upc: String!
+  type Note @key(fields: "id") {
+    id: Int!
     name: String
     price: Int
     weight: Int
@@ -15,13 +15,13 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-  Product: {
+  Note: {
     __resolveReference(object) {
-      return products.find(product => product.upc === object.upc);
+      return products.find(product => product.id === object.id);
     }
   },
   Query: {
-    topProducts(_, args) {
+    topNotes(_, args) {
       return products.slice(0, args.first);
     }
   }
@@ -36,25 +36,25 @@ const server = new ApolloServer({
   ])
 });
 
-server.listen({ port: 4003 }).then(({ url }) => {
+server.listen({ port: 4103 }).then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
 
 const products = [
   {
-    upc: "1",
+    id: 111,
     name: "Table",
     price: 899,
     weight: 100
   },
   {
-    upc: "2",
+    id: 222,
     name: "Couch",
     price: 1299,
     weight: 1000
   },
   {
-    upc: "3",
+    id: 333,
     name: "Chair",
     price: 54,
     weight: 50
