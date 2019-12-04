@@ -20,6 +20,7 @@
     "apollo-server": "^2.5.1-alpha.1",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "graphql": "latest"
+    "graphql": "latest",
+    "graphql-tools": "^4.0.6"
   }
 }

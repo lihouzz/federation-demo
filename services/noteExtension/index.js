@@ -1,8 +1,9 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
-const {graphql, parse} = require('graphql');
+const { graphql, parse } = require('graphql');
 const express = require('express');
 const bodyParser = require("body-parser");
+const { addResolveFunctionsToSchema } = require('graphql-tools');
 
 const typeDefs = gql`
   extend type Note @key(fields: "id") {
@@ -31,16 +32,27 @@ const resolvers = {
   }
 };
 
+let federatedSchema = buildFederatedSchema([
+  {
+    typeDefs
+  }
+]);
+
+let executableSchema = addResolveFunctionsToSchema(
+{
+      schema: federatedSchema,
+      resolvers: resolvers,
+      resolverValidationOptions: {
+          allowResolversNotInSchema: true
+      }
+});
+
+
 let handler = (req, res) => {
-  console.log('hit!');
+  console.log('hit!', req.body.query);
 
   return graphql(
-    buildFederatedSchema([
-      {
-        typeDefs,
-        resolvers
-      }
-    ]),
+    executableSchema,
     req.body.query,
     {},                 // root value
     {},
