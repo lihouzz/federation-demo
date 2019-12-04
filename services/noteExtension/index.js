@@ -1,5 +1,8 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
+const {graphql, parse} = require('graphql');
+const express = require('express');
+const bodyParser = require("body-parser");
 
 const typeDefs = gql`
   extend type Note @key(fields: "id") {
@@ -28,17 +31,37 @@ const resolvers = {
   }
 };
 
-const server = new ApolloServer({
-  schema: buildFederatedSchema([
-    {
-      typeDefs,
-      resolvers
-    }
-  ])
-});
+let handler = (req, res) => {
+  console.log('hit!');
 
-server.listen({ port: 4104 }).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+  return graphql(
+    buildFederatedSchema([
+      {
+        typeDefs,
+        resolvers
+      }
+    ]),
+    req.body.query,
+    {},                 // root value
+    {},
+    req.body.variables,
+    req.body.operationName       // operation name
+  ).then(result => {
+    res.json(result);
+    res.end(200);
+  });
+
+};
+
+const server = express();
+const port = 4104;
+
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.post('/graphql', handler);
+
+server.listen(4104, () => {
+  console.log(`🚀 GQL Server ready at 4104`);
 });
 
 const inventory = [
