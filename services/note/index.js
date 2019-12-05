@@ -33,22 +33,14 @@ const typeDefs = gql`
 
     extend type Query {
         topNotes(first: Int = 5): [Note]
-        getChatMessageObjectTest(first: Int): ChatMessageObjectTest
     }
 
     type Note @key(fields: "id") {
         id: Int
         content: String
         ownerId: Int
-    }
-
-    type ChatMessageObjectTest {
-        id: Int
-        note: NoteTest
-    }
-
-    extend type NoteTest @key(fields: "id") {
-        id: Int @external
+        price: Int
+        weight: Int
     }
 `;
 
@@ -62,20 +54,10 @@ const resolvers = {
             return product;
         }
     },
-    ChatMessageObjectTest: {
-        note(obj) {
-            console.log(obj);
-            return {id: obj.objectId};
-        }
-    },
     Query: {
         topNotes(_, args) {
             console.log(args);
             return products.slice(0, args.first);
-        },
-
-        getChatMessageObjectTest(_, args) {
-            return { id: 111, objectId: 1};
         },
     }
 };

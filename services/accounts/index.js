@@ -71,9 +71,9 @@ const server = new ApolloServer({
   ])
 });
 
-// server.listen({ port: 4101 }).then(({ url }) => {
-//   console.log(`🚀 Server ready at ${url}`);
-// });
+server.listen({ port: 4101 }).then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`);
+});
 
 const users = [
   {

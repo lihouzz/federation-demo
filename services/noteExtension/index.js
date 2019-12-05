@@ -6,8 +6,33 @@ const bodyParser = require("body-parser");
 const { addResolveFunctionsToSchema } = require('graphql-tools');
 
 const typeDefs = gql`
+    directive @mock(variant: String) on FIELD
+    directive @first(n: Int) on FIELD
+    directive @seo(method: String, pageType: SEO_PAGE_TYPES, defaultValue: String) on FIELD
+
+    enum SEO_PAGE_TYPES {
+        HOME
+        BROWSE_PHOTOS
+        PHOTOS_LANDING
+        BROWSE_PRODUCTS
+        PRODUCTS_LANDING
+        BROWSE_DISCUSSIONS
+        BROWSE_PROFESSIONALS
+        BROWSE_SERVICES
+        BROWSE_STORIES
+        VIEW_PHOTO
+        VIEW_PRODUCT
+        VIEW_QUESTION
+        VIEW_PROFILE
+        JOBS_PAGE
+        TEAM_PAGE
+        CITY_PAGE
+        NEWS_PAGE
+        PRO_SOLUTIONS_HOME
+    }  
+    
   extend type Note @key(fields: "id") {
-    id: Int! @external
+    id: Int @external
     weight: Int @external
     price: Int @external
     inStock: Boolean
