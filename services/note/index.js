@@ -6,29 +6,78 @@ const bodyParser = require("body-parser");
 const { addResolveFunctionsToSchema } = require('graphql-tools');
 
 const typeDefs = gql`
-  extend type Query {
-    topNotes(first: Int = 5): [Note]
-  }
+    directive @mock(variant: String) on FIELD
+    directive @first(n: Int) on FIELD
+    directive @seo(method: String, pageType: SEO_PAGE_TYPES, defaultValue: String) on FIELD
 
-  type Note @key(fields: "id") {
-    id: Int!
-    name: String
-    price: Int
-    weight: Int
-  }
+    enum SEO_PAGE_TYPES {
+        HOME
+        BROWSE_PHOTOS
+        PHOTOS_LANDING
+        BROWSE_PRODUCTS
+        PRODUCTS_LANDING
+        BROWSE_DISCUSSIONS
+        BROWSE_PROFESSIONALS
+        BROWSE_SERVICES
+        BROWSE_STORIES
+        VIEW_PHOTO
+        VIEW_PRODUCT
+        VIEW_QUESTION
+        VIEW_PROFILE
+        JOBS_PAGE
+        TEAM_PAGE
+        CITY_PAGE
+        NEWS_PAGE
+        PRO_SOLUTIONS_HOME
+    }
+
+    extend type Query {
+        topNotes(first: Int = 5): [Note]
+        getChatMessageObjectTest(first: Int): ChatMessageObjectTest
+    }
+
+    type Note @key(fields: "id") {
+        id: Int
+        content: String
+        ownerId: Int
+    }
+
+    type ChatMessageObjectTest {
+        id: Int
+        note: NoteTest
+    }
+
+    extend type NoteTest @key(fields: "id") {
+        id: Int @external
+    }
 `;
 
 const resolvers = {
-  Note: {
-    __resolveReference(object) {
-      return products.find(product => product.id === object.id);
+    Note: {
+        __resolveReference(object) {
+            console.log("DEMO Note resolveReference");
+            console.log(object);
+            let product = products.find(product => product.id === object.id);
+            console.log(product);
+            return product;
+        }
+    },
+    ChatMessageObjectTest: {
+        note(obj) {
+            console.log(obj);
+            return {id: obj.objectId};
+        }
+    },
+    Query: {
+        topNotes(_, args) {
+            console.log(args);
+            return products.slice(0, args.first);
+        },
+
+        getChatMessageObjectTest(_, args) {
+            return { id: 111, objectId: 1};
+        },
     }
-  },
-  Query: {
-    topNotes(_, args) {
-      return products.slice(0, args.first);
-    }
-  }
 };
 
 let executableSchema = buildFederatedSchema([

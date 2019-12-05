@@ -16,7 +16,7 @@ const gateway = new ApolloGateway({
 
   const server = new ApolloServer({ schema, executor });
 
-  server.listen().then(({ url }) => {
+  server.listen( {port: 4001} ).then(({ url }) => {
     console.log(`🚀 Server ready at ${url}`);
   });
 })();
