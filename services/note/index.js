@@ -31,20 +31,12 @@ const resolvers = {
   }
 };
 
-let federatedSchema = buildFederatedSchema([
+let executableSchema = buildFederatedSchema([
   {
-    typeDefs
+    typeDefs,
+    resolvers
   }
 ]);
-
-let executableSchema = addResolveFunctionsToSchema(
-{
-      schema: federatedSchema,
-      resolvers: resolvers,
-      resolverValidationOptions: {
-          allowResolversNotInSchema: true
-      }
-});
 
 
 let handler = (req, res) => {
