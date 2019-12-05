@@ -6,7 +6,8 @@ const gateway = new ApolloGateway({
     { name: "accounts", url: "http://localhost:4101/graphql" },
     { name: "chat", url: "http://localhost:4102/graphql" },
     { name: "note", url: "http://localhost:4103/graphql" },
-    { name: "noteExtension", url: "http://localhost:4104/graphql" }
+    { name: "noteExtension", url: "http://localhost:4104/graphql" },
+    //{ name: "houzzJukwaa", url: "http://localhost:3333/graphql-internal" }
   ]
 });
 
