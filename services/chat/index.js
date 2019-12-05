@@ -1,5 +1,9 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
+const { graphql, parse } = require('graphql');
+const express = require('express');
+const bodyParser = require("body-parser");
+const { addResolveFunctionsToSchema } = require('graphql-tools');
 
 const typeDefs = gql`
   type ChatMessageObject {
@@ -27,17 +31,47 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({
-  schema: buildFederatedSchema([
-    {
-      typeDefs,
-      resolvers
-    }
-  ])
+let federatedSchema = buildFederatedSchema([
+  {
+    typeDefs
+  }
+]);
+
+let executableSchema = addResolveFunctionsToSchema(
+{
+      schema: federatedSchema,
+      resolvers: resolvers,
+      resolverValidationOptions: {
+          allowResolversNotInSchema: true
+      }
 });
 
-server.listen({ port: 4102 }).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+
+let handler = (req, res) => {
+  console.log('hit!', req.body.query);
+
+  return graphql(
+    executableSchema,
+    req.body.query,
+    {},                 // root value
+    {},
+    req.body.variables,
+    req.body.operationName       // operation name
+  ).then(result => {
+    res.json(result);
+    res.end(200);
+  });
+
+};
+
+const server = express();
+
+server.use(bodyParser.urlencoded({ extended: false }));
+server.use(bodyParser.json());
+server.post('/graphql', handler);
+
+server.listen(4102, () => {
+  console.log(`🚀 GQL Server ready at 4102`);
 });
 
 const reviews = [

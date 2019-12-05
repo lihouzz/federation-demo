@@ -65,7 +65,6 @@ let handler = (req, res) => {
 };
 
 const server = express();
-const port = 4104;
 
 server.use(bodyParser.urlencoded({ extended: false }));
 server.use(bodyParser.json());
